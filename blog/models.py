@@ -1,0 +1,101 @@
+from unittest.util import _MAX_LENGTH
+from django.urls import reverse
+from django.db import models
+from django.contrib.auth import get_user_model
+
+
+tags = (
+    ('asi', 'asia'),
+    ('eur', 'europe'),
+    ('us','usa'),
+    )
+
+
+STATUS_POST = (
+        ('news', 'news'),
+        ('article', 'article'),
+        ('education', 'education'),
+    ) 
+
+
+class Post(models.Model):
+
+
+    STATUS_CHOICES = (
+        ('pub', 'Published'),
+        ('drf', 'Draft'),
+    )
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE , related_name='user')
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length= 200)
+    text = models.TextField()
+    datetime_created = models.DateTimeField(auto_now_add=True)
+    datetime_modified = models.DateTimeField(auto_now=True)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=3)
+    upload = models.ImageField(upload_to ='upload/' , blank=True)
+    tags = models.CharField(choices=tags, max_length=10)
+    type = models.CharField(choices=STATUS_POST, max_length=10)
+
+
+
+    
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[self.pk])
+
+
+
+
+class Comment(models.Model):
+
+    content = models.TextField()
+    post = models.ForeignKey(Post , on_delete=models.CASCADE , related_name='comments')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE , related_name='user_comment')
+
+
+    def __str__(self):
+
+        return self.content
+
+
+
+
+
+
+
+class EconomicCalender(models.Model):
+    
+
+
+    Currency = (
+
+       ('usd', 'usd'),
+       ('eur', 'eur'),
+       ('gbp','gbp'),
+       ('aud','aud'),
+       ('nzd','nzd'),
+       ('cad','cad'),
+       ('jpy','jpy'),
+       ('cny','cny')
+        )
+
+
+
+    Date = models.DateTimeField()
+    currency = models.CharField(choices=Currency, max_length=10)
+    name= models.CharField(max_length=200)
+    detail = models.TextField()
+    actual = models.CharField(max_length=100)
+    previous = models.CharField(max_length=100)
+    forecast = models.CharField(max_length=100)
+    
+
+
+    def __str__(self):
+
+        return f'{self.name} , {self.currency}'
+
+
